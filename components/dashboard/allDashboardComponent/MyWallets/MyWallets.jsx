@@ -173,6 +173,7 @@ const MyWallets = () => {
               <>
                 {walletsCardsData?.map((wallet, index) => (
                   <div
+                    key={wallet.id || index}
                     className="bg-center bg-cover bg-no-repeat rounded-[8px] p-[18px] relative"
                     style={{
                       backgroundImage: `url(${

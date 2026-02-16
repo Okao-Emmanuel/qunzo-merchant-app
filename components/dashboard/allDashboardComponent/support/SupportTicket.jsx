@@ -31,10 +31,16 @@ const SupportTicket = () => {
         subject: searchQuery,
         status: status,
       });
-      setSupportTickets(res.data.data);
-      setPerPage(res.data.data.pagination.per_page);
-      setLastPage(res.data.data.pagination.last_page);
-      setTotal(res.data.data.pagination.total);
+      if (res?.status === "completed" && res?.data?.data) {
+        setSupportTickets(res.data.data);
+        if (res.data.data.pagination) {
+          setPerPage(res.data.data.pagination.per_page);
+          setLastPage(res.data.data.pagination.last_page);
+          setTotal(res.data.data.pagination.total);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching support tickets:", error);
     } finally {
       setLoading(false);
       setHasFetched(true);

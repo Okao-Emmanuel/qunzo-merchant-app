@@ -35,7 +35,11 @@ const RecentTransaction = () => {
     try {
       setLoading(true);
       const response = await networkService.get(ApiPath.transactions);
-      setTransactions(response.data.data.transactions);
+      if (response?.status === "completed" && response?.data?.data?.transactions) {
+        setTransactions(response.data.data.transactions);
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
     } finally {
       setLoading(false);
       setHasFetched(true);

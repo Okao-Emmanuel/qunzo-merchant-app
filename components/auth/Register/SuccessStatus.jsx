@@ -29,9 +29,33 @@ const SuccessStatus = () => {
     }
   };
 
+  // Auto-select first document type and redirect to KYC submission
+  const handleAutoKYCRedirect = async () => {
+    try {
+      const res = await network.get(ApiPath.documentTypes, {
+        for: "merchant",
+      });
+      if (res.status === "completed" && res.data.data.length > 0) {
+        const firstDocType = res.data.data[0];
+        localStorage.setItem("selectedDocumentType", JSON.stringify(firstDocType));
+        // Use hard redirect to bypass any caching issues
+        window.location.href = "/auth/step-verification/id-verification-files";
+      }
+    } catch (error) {
+      console.error("Error fetching document types:", error);
+    }
+  };
+
   useEffect(() => {
     userData();
   }, []);
+
+  // Auto-redirect to KYC submission if user needs verification
+  useEffect(() => {
+    if (user && (user?.kyc == "0" || user?.kyc == "4") && !user?.boarding_steps?.completed) {
+      handleAutoKYCRedirect();
+    }
+  }, [user]);
 
   const steps = [
     {
@@ -72,16 +96,32 @@ const SuccessStatus = () => {
   const getIconColorClass = (completed) =>
     completed ? "text-white" : "text-[#A3A3A3]";
 
+  const handleSubmitAgain = async () => {
+    try {
+      const res = await network.get(ApiPath.documentTypes, {
+        for: "merchant",
+      });
+      if (res.status === "completed" && res.data.data.length > 0) {
+        const firstDocType = res.data.data[0];
+        localStorage.setItem("selectedDocumentType", JSON.stringify(firstDocType));
+        // Use hard redirect to bypass any caching issues
+        window.location.href = "/auth/step-verification/id-verification-files";
+      }
+    } catch (error) {
+      console.error("Error fetching document types:", error);
+    }
+  };
+
   const renderNextButton = () => {
     if (user?.merchant?.is_rejected && user?.kyc == "3") {
       return (
-        <Link
-          href="/auth/step-verification/id-verification-choose"
+        <button
+          onClick={handleSubmitAgain}
           className="group primary-button w-full"
         >
           <span className="primary-button-hover-effect"></span>
           <span className="primary-button-text">Submit Again</span>
-        </Link>
+        </button>
       );
     } else if (user?.boarding_steps?.completed) {
       return (
@@ -91,14 +131,11 @@ const SuccessStatus = () => {
         </Link>
       );
     } else if (user?.kyc == "0" || user?.kyc == "4") {
-      const link = !isMobile
-        ? "/auth/step-verification/scan-qrcode"
-        : "/auth/step-verification/id-verification-choose";
+      // Auto-redirecting to KYC submission, show loading state
       return (
-        <Link href={link} className="group primary-button w-full">
-          <span className="primary-button-hover-effect"></span>
-          <span className="primary-button-text">Next Step</span>
-        </Link>
+        <div className="group primary-button w-full opacity-75 cursor-not-allowed">
+          <span className="primary-button-text">Redirecting to KYC...</span>
+        </div>
       );
     }
     return null;

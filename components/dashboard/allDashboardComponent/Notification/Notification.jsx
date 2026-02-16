@@ -26,11 +26,17 @@ const Notification = () => {
         per_page: perPage,
       });
 
-      const meta = response.data.data.meta;
-      setPerPage(meta.per_page);
-      setLastPage(meta.last_page);
-      setTotal(meta.total);
-      setNotifications(response.data.data);
+      if (response?.status === "completed" && response?.data?.data) {
+        const meta = response.data.data.meta;
+        if (meta) {
+          setPerPage(meta.per_page);
+          setLastPage(meta.last_page);
+          setTotal(meta.total);
+        }
+        setNotifications(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
     } finally {
       setLoading(false);
     }
@@ -82,13 +88,14 @@ const Notification = () => {
                 </div>
               ) : (
                 <>
-                  {notifications?.notifications?.map((notification) => {
+                  {notifications?.notifications?.map((notification, index) => {
                     const { icon, bg } =
                       notificationStyles[notification.type] ||
                       notificationStyles.default;
 
                     return (
                       <div
+                        key={notification.id || notification.created_at || index}
                         className={`w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-[10px] rounded-[11px] mb-[30px] last:mb-0`}
                       >
                         <div className="left flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-[16px]">

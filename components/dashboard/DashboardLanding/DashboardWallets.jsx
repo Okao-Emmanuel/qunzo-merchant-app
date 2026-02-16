@@ -77,7 +77,11 @@ const DashboardWallets = () => {
     try {
       setLoading(true);
       const response = await networkService.get(ApiPath.wallets);
-      setWalletsCardsData(response.data.data.wallets);
+      if (response?.status === "completed" && response?.data?.data?.wallets) {
+        setWalletsCardsData(response.data.data.wallets);
+      }
+    } catch (error) {
+      console.error("Error fetching wallets:", error);
     } finally {
       setLoading(false);
     }

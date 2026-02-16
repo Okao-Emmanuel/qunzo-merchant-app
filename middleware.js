@@ -18,6 +18,13 @@ export function middleware(request) {
   // if (pathname.startsWith("/auth/step-verification")) {
   //   return NextResponse.next();
   // }
+  // Redirect scan-qrcode page directly to ID verification (QR verification disabled)
+  if (pathname === "/auth/step-verification/scan-qrcode") {
+    return NextResponse.redirect(
+      new URL("/auth/step-verification/id-verification-choose", request.url)
+    );
+  }
+
   if (
     // pathname === "/auth/login" ||
     pathname.startsWith("/auth/login/two-fa-verification-page") ||

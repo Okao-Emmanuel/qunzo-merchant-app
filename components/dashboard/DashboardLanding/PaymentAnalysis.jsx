@@ -21,9 +21,18 @@ const PaymentAnalysis = () => {
       const res = await network.get(ApiPath.paymentAnalysis, {
         date: selectedDate,
       });
-      if (res.data.status === "success") {
-        setChartData(res.data.data.data);
+      // NetworkService returns { status: "completed", data: apiResponse }
+      if (res?.status === "completed" && res?.data) {
+        // Check if API response has nested status and data structure
+        if (res.data?.status === "success" && res.data?.data) {
+          setChartData(res.data.data.data || res.data.data);
+        } else if (res.data?.data) {
+          // Fallback: use data directly if no status field
+          setChartData(res.data.data);
+        }
       }
+    } catch (error) {
+      console.error("Error fetching payment analysis:", error);
     } finally {
     }
   };
